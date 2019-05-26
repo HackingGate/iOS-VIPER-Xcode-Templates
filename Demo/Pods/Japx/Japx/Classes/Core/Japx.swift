@@ -94,7 +94,7 @@ public extension Japx.Decoder {
     /// - returns: JSON object as Data.
     static func data(withJSONAPIObject object: Parameters, includeList: String? = nil) throws -> Data {
         let decoded = try jsonObject(withJSONAPIObject: object, includeList: includeList)
-        return try JSONSerialization.data(withJSONObject: decoded, options: .init(rawValue: 0))
+        return try JSONSerialization.data(withJSONObject: decoded)
     }
     
     /// Converts JSON:API object to simple flat JSON object
@@ -104,7 +104,7 @@ public extension Japx.Decoder {
     ///
     /// - returns: JSON object.
     static func jsonObject(with data: Data, includeList: String? = nil) throws -> Parameters {
-        let jsonApiObject = try JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0))
+        let jsonApiObject = try JSONSerialization.jsonObject(with: data)
         
         // With include list
         if let includeList = includeList {
@@ -134,7 +134,7 @@ public extension Japx.Decoder {
     /// - returns: JSON object as Data.
     static func data(with data: Data, includeList: String? = nil) throws -> Data {
         let decoded = try jsonObject(with: data, includeList: includeList)
-        return try JSONSerialization.data(withJSONObject: decoded, options: .init(rawValue: 0))
+        return try JSONSerialization.data(withJSONObject: decoded)
     }
 }
 
@@ -149,7 +149,7 @@ public extension Japx.Encoder {
     ///
     /// - returns: JSON:API object.
     static func encode(data: Data, additionalParams: Parameters? = nil) throws -> Parameters {
-        let json = try JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0))
+        let json = try JSONSerialization.jsonObject(with: data)
         if let jsonObject = json as? Parameters {
             return try encode(json: jsonObject, additionalParams: additionalParams)
         }
@@ -179,7 +179,7 @@ public extension Japx.Encoder {
     /// - returns: JSON:API object.
     static func encode(json: [Parameters], additionalParams: Parameters? = nil) throws -> Parameters {
         var params = additionalParams ?? [:]
-        params[Consts.APIKeys.data] = try json.flatMap { try encodeAttributesAndRelationships(on: $0) as AnyObject }
+        params[Consts.APIKeys.data] = try json.compactMap { try encodeAttributesAndRelationships(on: $0) as AnyObject }
         return params
     }
 }
@@ -281,13 +281,18 @@ private extension Japx.Decoder {
             }
             let otherObjects = try otherObjectsData
                 .map { try $0.extractTypeIdPair() }
-                .flatMap { allObjects[$0] }
-                .map {  try resolve(object: $0,
-                                    allObjects: allObjects,
-                                    paramsDict: try paramsDict.dictionary(for: relationshipsKey)) }
-            if otherObjects.isEmpty { return }
+                .compactMap { allObjects[$0] }
+                .map { try resolve(object: $0,
+                                   allObjects: allObjects,
+                                   paramsDict: try paramsDict.dictionary(for: relationshipsKey))
+                }
+
             let isObject = relationship[Consts.APIKeys.data].map { $0 is Parameters } ?? false
-            result[relationshipsKey] = (isObject && otherObjects.count == 1) ? otherObjects[0] : otherObjects
+            if isObject {
+                result[relationshipsKey] = (otherObjects.count == 1) ? otherObjects[0] : NSNull()
+            } else {
+                result[relationshipsKey] = otherObjects
+            }
         })
         
         return attributes.merging(relationships) { $1 }
@@ -319,7 +324,7 @@ private extension Japx.Decoder {
                 // Fetch those object from `objects`
                 let othersObjects = try others
                     .map { try $0.extractTypeIdPair() }
-                    .flatMap { objects[$0] }
+                    .compactMap { objects[$0] }
                 
                 // Store relationships
                 let isObject = relationshipParams
@@ -387,11 +392,12 @@ private extension Japx.Encoder {
 // MARK: - General helper extensions -
 
 extension TypeIdPair: Hashable, Equatable {
-    
-    var hashValue: Int {
-        return (type + id).hashValue
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(type)
+        hasher.combine(id)
     }
-    
+
     static func == (lhs: TypeIdPair, rhs: TypeIdPair) -> Bool {
         return lhs.type == rhs.type && lhs.id == rhs.id
     }
