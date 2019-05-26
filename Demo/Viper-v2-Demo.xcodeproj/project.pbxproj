@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -31,7 +31,6 @@
 		52CD6182207DE27200AFB254 /* VIper_v2_DemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CD6181207DE27200AFB254 /* VIper_v2_DemoTests.swift */; };
 		52CD6190207DE28800AFB254 /* VIper_v2_DemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CD618F207DE28800AFB254 /* VIper_v2_DemoUITests.swift */; };
 		52CD61C8207DE32200AFB254 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52CD619A207DE32100AFB254 /* Main.storyboard */; };
-		52CD61C9207DE32200AFB254 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52CD619C207DE32100AFB254 /* Info.plist */; };
 		52CD61CA207DE32200AFB254 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CD619E207DE32200AFB254 /* Constants.swift */; };
 		52CD61CB207DE32200AFB254 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CD619F207DE32200AFB254 /* AppDelegate.swift */; };
 		52CD61CC207DE32200AFB254 /* ThemeInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CD61A1207DE32200AFB254 /* ThemeInitializer.swift */; };
@@ -601,7 +600,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				52CD61C8207DE32200AFB254 /* Main.storyboard in Resources */,
-				52CD61C9207DE32200AFB254 /* Info.plist in Resources */,
 				52CD61E7207DE3C800AFB254 /* LaunchScreen.storyboard in Resources */,
 				52CD6204207DF3B200AFB254 /* Home.storyboard in Resources */,
 				521A3FB6207E2F88001EFB92 /* PokemonDetails.storyboard in Resources */,
